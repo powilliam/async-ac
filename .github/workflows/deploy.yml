@@ -13,4 +13,4 @@ jobs:
       - run: |
           yarn
           yarn build
-          cp -a dist/. public/
+          yarn serve
