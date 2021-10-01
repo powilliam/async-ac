@@ -4,16 +4,9 @@ import { useService } from "./hooks/use-service";
 
 import { wait } from "./utils/promise";
 
-import { AutoComplete } from "./components/auto-complete";
+import { AsyncAutoComplete } from "./components/async-auto-complete";
 
 export default function App() {
-  const { connectivityState, options } = useService(
-    () => wait(["William", "Juliano"]),
-    {
-      toOptions: (names) => names.map((it) => ({ key: it, value: it })),
-    }
-  );
-
   return (
     <Flex
       width="100vw"
@@ -21,7 +14,10 @@ export default function App() {
       alignItems="center"
       justifyContent="center"
     >
-      <AutoComplete connectivityState={connectivityState} options={options} />
+      <AsyncAutoComplete
+        service={() => wait(["William", "Juliano"])}
+        toOptions={(names) => names.map((it) => ({ key: it, value: it }))}
+      />
     </Flex>
   );
 }

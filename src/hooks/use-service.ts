@@ -19,7 +19,7 @@ export interface UseService<T> {
 
 export function useService<T>(
   executor: () => Promise<T>,
-  { execution = "ON_MOUNT", toOptions }: UseServiceConfig<T>
+  { execution = "ON_MOUNT", toOptions, onFailure }: UseServiceConfig<T>
 ): UseService<T> {
   const [connectivityState, connectivityStateSet] =
     useState<ConnectivityState>("IDLE");
@@ -33,6 +33,7 @@ export function useService<T>(
       optionsSet(asOptions);
     } catch (error) {
       connectivityStateSet("FAILURE");
+      onFailure && onFailure(error as Error);
     } finally {
       connectivityStateSet("IDLE");
     }
