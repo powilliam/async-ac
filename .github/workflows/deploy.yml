@@ -14,4 +14,4 @@ jobs:
           yarn
           yarn build
       - run: |
-          npx gh-pages -build
+          npx gh-pages -d dist
