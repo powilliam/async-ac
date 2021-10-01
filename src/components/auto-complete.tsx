@@ -47,11 +47,7 @@ function AutoCompleteComponent(
   return (
     <Box position="relative" {...rest}>
       <InputGroup>
-        {LeftComponent && (
-          <InputLeftElement>
-            <LeftComponent />
-          </InputLeftElement>
-        )}
+        {LeftComponent && <LeftComponent />}
         <Input ref={inputRef} value={value} onChange={onChange} />
         <InputRightElement>
           {RightComponent ? (
