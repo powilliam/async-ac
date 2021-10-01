@@ -15,7 +15,10 @@ import {
 } from "@chakra-ui/react";
 import { ChevronDownIcon, CloseIcon } from "@chakra-ui/icons";
 
-import { useAutoCompleteState } from "../hooks/use-autocomplete-state";
+import {
+  AutoCompleteState,
+  useAutoCompleteState,
+} from "../hooks/use-autocomplete-state";
 
 import { Option } from "../@types/option";
 
@@ -23,62 +26,75 @@ import { SMALL_ICON_SIZE } from "../constants/icon";
 
 import { Menu } from "./menu";
 
-export interface RightComponentProps {
-  value: string;
-}
+export type PositionalComponent = FunctionComponent<Partial<AutoCompleteState>>;
 
-export interface AutoCompleteProps extends BoxProps {
+export interface AutoCompleteProps
+  extends BoxProps,
+    Partial<Omit<AutoCompleteState, "onResetState">> {
   options: Option<any>[];
-  LeftComponent?: FunctionComponent;
-  RightComponent?: FunctionComponent<RightComponentProps>;
+  LeftComponent?: PositionalComponent;
+  RightComponent?: PositionalComponent;
 }
 
 function AutoCompleteComponent(
-  { LeftComponent, RightComponent, options, ...rest }: AutoCompleteProps,
+  {
+    LeftComponent,
+    RightComponent,
+    options,
+    value,
+    selected,
+    isMenuOpen,
+    onInputFocus,
+    onChangeValue,
+    onSelectOption,
+    ...rest
+  }: AutoCompleteProps,
   inputRef: ForwardedRef<HTMLInputElement>
 ) {
   const menuRef = useRef() as RefObject<HTMLDivElement>;
 
-  const {
+  const state = useAutoCompleteState({
+    ref: menuRef,
     value,
     selected,
     isMenuOpen,
-    reset,
-    onFocus,
-    onChange,
+    onInputFocus,
+    onChangeValue,
     onSelectOption,
-  } = useAutoCompleteState({
-    ref: menuRef,
   });
 
   return (
     <Box position="relative" {...rest}>
       <InputGroup>
         <InputLeftElement>
-          {LeftComponent && <LeftComponent />}
+          {LeftComponent && <LeftComponent {...state} />}
         </InputLeftElement>
         <Input
           ref={inputRef}
-          value={value}
-          onFocus={onFocus}
-          onChange={onChange}
+          value={state.value}
+          onFocus={state.onInputFocus}
+          onChange={state.onChangeValue}
         />
         <InputRightElement>
           {RightComponent ? (
-            <RightComponent value={value} />
-          ) : !value ? (
+            <RightComponent {...state} />
+          ) : !state.value ? (
             <ChevronDownIcon {...SMALL_ICON_SIZE} />
           ) : (
-            <CloseIcon {...SMALL_ICON_SIZE} cursor="pointer" onClick={reset} />
+            <CloseIcon
+              {...SMALL_ICON_SIZE}
+              cursor="pointer"
+              onClick={state.onResetState}
+            />
           )}
         </InputRightElement>
       </InputGroup>
       <Menu
         ref={menuRef}
-        selected={selected}
+        selected={state.selected}
         options={options}
-        isOpen={isMenuOpen}
-        onSelectOption={onSelectOption}
+        isOpen={state.isMenuOpen}
+        onSelectOption={state.onSelectOption}
       />
     </Box>
   );

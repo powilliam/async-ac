@@ -1,8 +1,7 @@
+import { MEMBERS } from "../constants/balde";
+
 import { wait } from "../utils/promise";
 
 export function getMembers() {
-  return wait(
-    ["William", "Juliano", "Matheus", "Igão", "Italo", "Zaza", "Clebinho"],
-    2000
-  );
+  return wait(MEMBERS, 2000);
 }
