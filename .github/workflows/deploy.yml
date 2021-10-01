@@ -8,10 +8,10 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
       - run: |
-          git config --global user.email "actions@github.com"
-          git config --global user.name "actions"
+          git config --global user.email "support+actions@github.com"
+          git config --global user.name "github-actions-bot"
       - run: |
           yarn
           yarn build
       - run: |
-          npx gh-pages -d dist
+          npx gh-pages -d dist -u "github-actions-bot <support+actions@github.com>"
