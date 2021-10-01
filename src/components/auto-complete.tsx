@@ -21,7 +21,7 @@ import { ConnectivityState } from "../@types/connectivity";
 
 export interface AutoCompleteProps extends BoxProps {
   connectivityState?: ConnectivityState;
-  options: Option<number, string>[];
+  options: Option<any>[];
 }
 
 export function AutoComplete({

@@ -12,9 +12,9 @@ export interface UseAutoCompleteStateConfig<T extends RefObject<HTMLElement>> {
 export interface AutoCompleteState {
   value: string;
   isMenuOpen: boolean;
-  selected?: Option<number, string>;
+  selected?: Option<any>;
   onChange(event: OnChangeEvent): void;
-  onSelectOption(option: Option<number, string>): void;
+  onSelectOption(option: Option<any>): void;
   reset(): void;
 }
 
@@ -22,9 +22,7 @@ export function useAutoCompleteState<T extends RefObject<HTMLElement>>({
   ref,
 }: UseAutoCompleteStateConfig<T>): AutoCompleteState {
   const [value, valueSet] = useState<string>("");
-  const [selected, selectedSet] = useState<
-    Option<number, string> | undefined
-  >();
+  const [selected, selectedSet] = useState<Option<any> | undefined>();
   const [isMenuOpen, isMenuOpenSet] = useState<boolean>(false);
 
   const onChange = useCallback(
@@ -35,7 +33,7 @@ export function useAutoCompleteState<T extends RefObject<HTMLElement>>({
     [isMenuOpen]
   );
 
-  const onSelectOption = useCallback((option: Option<number, string>) => {
+  const onSelectOption = useCallback((option: Option<any>) => {
     selectedSet(option);
     valueSet(option.value);
   }, []);
