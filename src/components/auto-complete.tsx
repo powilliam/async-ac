@@ -1,4 +1,4 @@
-import { useRef, RefObject } from "react";
+import { useRef, RefObject, forwardRef, ForwardedRef } from "react";
 import {
   Box,
   InputGroup,
@@ -24,15 +24,14 @@ export interface AutoCompleteProps extends BoxProps {
   options: Option<any>[];
 }
 
-export function AutoComplete({
-  connectivityState = "IDLE",
-  options,
-  ...rest
-}: AutoCompleteProps) {
-  const ref = useRef() as RefObject<HTMLDivElement>;
+function AutoCompleteComponent(
+  { connectivityState = "IDLE", options, ...rest }: AutoCompleteProps,
+  ref: ForwardedRef<HTMLInputElement>
+) {
+  const menuRef = useRef() as RefObject<HTMLDivElement>;
 
   const { value, isMenuOpen, reset, onChange, onSelectOption } =
-    useAutoCompleteState({ ref });
+    useAutoCompleteState({ ref: menuRef });
 
   return (
     <Box position="relative" {...rest}>
@@ -52,7 +51,7 @@ export function AutoComplete({
             )}
           </InputLeftElement>
         )}
-        <Input value={value} onChange={onChange} />
+        <Input ref={ref} value={value} onChange={onChange} />
         <InputRightElement>
           {!value ? (
             <ChevronDownIcon {...SMALL_ICON_SIZE} />
@@ -62,7 +61,7 @@ export function AutoComplete({
         </InputRightElement>
       </InputGroup>
       <Menu
-        ref={ref}
+        ref={menuRef}
         options={options}
         isOpen={isMenuOpen}
         onSelectOption={onSelectOption}
@@ -70,3 +69,5 @@ export function AutoComplete({
     </Box>
   );
 }
+
+export const AutoComplete = forwardRef(AutoCompleteComponent);

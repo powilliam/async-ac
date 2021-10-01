@@ -1,8 +1,8 @@
 import { Flex } from "@chakra-ui/react";
 
-import { useService } from "./hooks/use-service";
+import { onMapNamesToOptions } from "./utils/mappers";
 
-import { wait } from "./utils/promise";
+import { getMembers } from "./services/balde";
 
 import { AsyncAutoComplete } from "./components/async-auto-complete";
 
@@ -15,8 +15,13 @@ export default function App() {
       justifyContent="center"
     >
       <AsyncAutoComplete
-        service={() => wait(["William", "Juliano"])}
-        toOptions={(names) => names.map((it) => ({ key: it, value: it }))}
+        service={() => getMembers()}
+        onMapToOptions={(names) => onMapNamesToOptions(names)}
+        onLoading={() => console.log("onLoading")}
+        onSuccess={(response) =>
+          console.log(`onSuccess: ${JSON.stringify(response)}`)
+        }
+        onFailure={() => console.log("onFailure")}
       />
     </Flex>
   );

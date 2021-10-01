@@ -5,10 +5,20 @@ import { ConnectivityState } from "../@types/connectivity";
 
 export type ExecutionMode = "ON_MOUNT" | "WHEN_CALLED";
 
+export interface ServiceMappers<T> {
+  onMapToOptions(value: T): Option<any>[];
+}
+
+export interface ServiceLifecycle<T> {
+  onLoading?(): void;
+  onSuccess?(response: T): void;
+  onFailure?<T extends Error>(reason: T): void;
+}
+
 export interface UseServiceConfig<T> {
   execution?: ExecutionMode;
-  toOptions(response: T): Option<any>[];
-  onFailure?<T extends Error>(reason: T): void;
+  mappers: ServiceMappers<T>;
+  lifecycle: ServiceLifecycle<T>;
 }
 
 export interface UseService<T> {
@@ -19,7 +29,11 @@ export interface UseService<T> {
 
 export function useService<T>(
   executor: () => Promise<T>,
-  { execution = "ON_MOUNT", toOptions, onFailure }: UseServiceConfig<T>
+  {
+    execution = "ON_MOUNT",
+    mappers: { onMapToOptions },
+    lifecycle: { onLoading, onSuccess, onFailure },
+  }: UseServiceConfig<T>
 ): UseService<T> {
   const [connectivityState, connectivityStateSet] =
     useState<ConnectivityState>("IDLE");
@@ -27,17 +41,18 @@ export function useService<T>(
 
   const execute = useCallback(async () => {
     connectivityStateSet("LOADING");
+    onLoading && onLoading();
     try {
       const response = await executor();
-      const asOptions = toOptions(response);
-      optionsSet(asOptions);
+      const options = onMapToOptions(response);
+      optionsSet(options);
+      connectivityStateSet("SUCCESSFUL");
+      onSuccess && onSuccess(response);
     } catch (error) {
       connectivityStateSet("FAILURE");
       onFailure && onFailure(error as Error);
-    } finally {
-      connectivityStateSet("IDLE");
     }
-  }, [executor, toOptions]);
+  }, [executor, onMapToOptions, onLoading, onSuccess, onFailure]);
 
   useEffect(() => {
     execution === "ON_MOUNT" && execute();
