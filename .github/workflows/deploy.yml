@@ -16,6 +16,6 @@ jobs:
       - run: |
           cd dist
           git switch -c gh-pages
-          git add .
+          git add . -f
           git commit -m "release: github-pages"
           git push origin gh-pages
