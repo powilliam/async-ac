@@ -1,4 +1,4 @@
-import { forwardRef, ForwardedRef } from "react";
+import { forwardRef, ForwardedRef, useMemo, Fragment } from "react";
 import { Box, Button, BoxProps } from "@chakra-ui/react";
 
 import { Option } from "../@types/option";
@@ -18,9 +18,14 @@ function MenuComponent(
   }: MenuProps,
   ref: ForwardedRef<HTMLDivElement>
 ) {
+  const shouldAppear = useMemo(
+    () => isOpen && options.length > 0,
+    [isOpen, options]
+  );
+
   return (
-    <>
-      {isOpen && (
+    <Fragment>
+      {shouldAppear && (
         <Box
           ref={ref}
           position="absolute"
@@ -50,7 +55,7 @@ function MenuComponent(
           ))}
         </Box>
       )}
-    </>
+    </Fragment>
   );
 }
 
