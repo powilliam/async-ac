@@ -10,6 +10,7 @@ import { useKonamiCode } from "../hooks/use-konami-code";
 import { ConnectivityStatus } from "./connectivity-status";
 import { AutoComplete, AutoCompleteProps } from "./auto-complete";
 import { KONAMI_SEQUENCE } from "../constants/keys";
+
 export interface AsyncAutoCompleteProps<T>
   extends Omit<AutoCompleteProps, "options">,
     Omit<UseServiceConfig<T>, "lifecycle" | "mappers">,
