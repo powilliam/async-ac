@@ -3,27 +3,32 @@ import {
   Box,
   InputGroup,
   Input,
+  InputLeftElement,
   InputRightElement,
   BoxProps,
+  CircularProgress,
 } from "@chakra-ui/react";
-import { ChevronDownIcon, CloseIcon } from "@chakra-ui/icons";
+import { ChevronDownIcon, CloseIcon, WarningIcon } from "@chakra-ui/icons";
 
 import { useAutoCompleteState } from "../hooks/use-autocomplete-state";
 
 import { Option } from "../@types/option";
 
-import { Menu } from "./menu";
+import { DEFAULT_ICON_SIZE, SMALL_ICON_SIZE } from "../constants/icon";
 
-const defaultIconProps = {
-  w: "12px",
-  h: "12px",
-};
+import { Menu } from "./menu";
+import { ConnectivityState } from "../@types/connectivity";
 
 export interface AutoCompleteProps extends BoxProps {
+  connectivityState?: ConnectivityState;
   options: Option<number, string>[];
 }
 
-export function AutoComplete({ options, ...rest }: AutoCompleteProps) {
+export function AutoComplete({
+  connectivityState = "IDLE",
+  options,
+  ...rest
+}: AutoCompleteProps) {
   const ref = useRef() as RefObject<HTMLDivElement>;
 
   const { value, isMenuOpen, reset, onChange, onSelectOption } =
@@ -32,12 +37,27 @@ export function AutoComplete({ options, ...rest }: AutoCompleteProps) {
   return (
     <Box position="relative" {...rest}>
       <InputGroup>
+        {["LOADING", "FAILURE"].includes(connectivityState) && (
+          <InputLeftElement>
+            {connectivityState === "LOADING" && (
+              <CircularProgress
+                isIndeterminate
+                size={DEFAULT_ICON_SIZE.w}
+                trackColor="transparent"
+                color="blue.300"
+              />
+            )}
+            {connectivityState === "FAILURE" && (
+              <WarningIcon {...DEFAULT_ICON_SIZE} color="red.300" />
+            )}
+          </InputLeftElement>
+        )}
         <Input value={value} onChange={onChange} />
         <InputRightElement>
           {!value ? (
-            <ChevronDownIcon {...defaultIconProps} />
+            <ChevronDownIcon {...SMALL_ICON_SIZE} />
           ) : (
-            <CloseIcon {...defaultIconProps} cursor="pointer" onClick={reset} />
+            <CloseIcon {...SMALL_ICON_SIZE} cursor="pointer" onClick={reset} />
           )}
         </InputRightElement>
       </InputGroup>

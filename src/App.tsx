@@ -12,7 +12,7 @@ export default function App() {
       alignItems="center"
       justifyContent="center"
     >
-      <AutoComplete options={options} />
+      <AutoComplete connectivityState="LOADING" options={options} />
     </Flex>
   );
 }
