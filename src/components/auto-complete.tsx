@@ -39,7 +39,7 @@ function AutoCompleteComponent(
 ) {
   const menuRef = useRef() as RefObject<HTMLDivElement>;
 
-  const { value, isMenuOpen, reset, onChange, onSelectOption } =
+  const { value, isMenuOpen, reset, onFocus, onChange, onSelectOption } =
     useAutoCompleteState({
       ref: menuRef,
     });
@@ -47,8 +47,15 @@ function AutoCompleteComponent(
   return (
     <Box position="relative" {...rest}>
       <InputGroup>
-        {LeftComponent && <LeftComponent />}
-        <Input ref={inputRef} value={value} onChange={onChange} />
+        <InputLeftElement>
+          {LeftComponent && <LeftComponent />}
+        </InputLeftElement>
+        <Input
+          ref={inputRef}
+          value={value}
+          onFocus={onFocus}
+          onChange={onChange}
+        />
         <InputRightElement>
           {RightComponent ? (
             <RightComponent value={value} />

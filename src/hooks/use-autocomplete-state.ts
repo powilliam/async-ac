@@ -1,4 +1,10 @@
-import { RefObject, useState, useCallback, ChangeEvent } from "react";
+import {
+  RefObject,
+  useState,
+  useCallback,
+  ChangeEvent,
+  FocusEventHandler,
+} from "react";
 import { useOutsideClick } from "@chakra-ui/react";
 
 import { Option } from "../@types/option";
@@ -13,6 +19,7 @@ export interface AutoCompleteState {
   value: string;
   isMenuOpen: boolean;
   selected?: Option<any>;
+  onFocus: FocusEventHandler<HTMLInputElement>;
   onChange(event: OnChangeEvent): void;
   onSelectOption(option: Option<any>): void;
   reset(): void;
@@ -25,6 +32,11 @@ export function useAutoCompleteState<T extends RefObject<HTMLElement>>({
   const [selected, selectedSet] = useState<Option<any> | undefined>();
   const [isMenuOpen, isMenuOpenSet] = useState<boolean>(false);
 
+  const onFocus = useCallback<FocusEventHandler<HTMLInputElement>>(
+    (e) => !isMenuOpen && isMenuOpenSet(true),
+    [isMenuOpen]
+  );
+
   const onChange = useCallback(
     (e: OnChangeEvent) => {
       valueSet(e.target.value);
@@ -33,10 +45,14 @@ export function useAutoCompleteState<T extends RefObject<HTMLElement>>({
     [isMenuOpen]
   );
 
-  const onSelectOption = useCallback((option: Option<any>) => {
-    selectedSet(option);
-    valueSet(option.value);
-  }, []);
+  const onSelectOption = useCallback(
+    (option: Option<any>) => {
+      selectedSet(option);
+      valueSet(option.value);
+      isMenuOpen && isMenuOpenSet(false);
+    },
+    [isMenuOpen]
+  );
 
   const reset = useCallback(() => {
     valueSet("");
@@ -46,12 +62,14 @@ export function useAutoCompleteState<T extends RefObject<HTMLElement>>({
   useOutsideClick({
     ref,
     handler: () => isMenuOpenSet(false),
+    enabled: isMenuOpen,
   });
 
   return {
     value,
     isMenuOpen,
     selected,
+    onFocus,
     onChange,
     onSelectOption,
     reset,
