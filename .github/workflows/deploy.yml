@@ -14,8 +14,4 @@ jobs:
           yarn
           yarn build
       - run: |
-          cd dist
-          git switch -c gh-pages
-          git add . -f
-          git commit -m "release: github-pages"
-          git push origin gh-pages
+          npx gh-pages -build
