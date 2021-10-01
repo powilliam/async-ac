@@ -1,10 +1,14 @@
 import { forwardRef, ForwardedRef, useMemo, Fragment } from "react";
 import { Box, Button, BoxProps } from "@chakra-ui/react";
+import { CheckIcon } from "@chakra-ui/icons";
+
+import { SMALL_ICON_SIZE } from "../constants/icon";
 
 import { Option } from "../@types/option";
 
 export interface MenuProps extends BoxProps {
   isOpen?: boolean;
+  selected?: Option<any>;
   options?: Option<any>[];
   onSelectOption?(option: Option<any>): void;
 }
@@ -12,6 +16,7 @@ export interface MenuProps extends BoxProps {
 function MenuComponent(
   {
     isOpen = false,
+    selected,
     options = [],
     onSelectOption = () => {},
     ...rest
@@ -47,10 +52,11 @@ function MenuComponent(
               key={it.key}
               variant="ghost"
               width="100%"
-              justifyContent="start"
+              justifyContent="space-between"
               onClick={() => onSelectOption(it)}
             >
               {it.value}
+              {selected === it && <CheckIcon {...SMALL_ICON_SIZE} />}
             </Button>
           ))}
         </Box>
