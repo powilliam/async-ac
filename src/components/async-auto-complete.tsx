@@ -21,7 +21,6 @@ export interface AsyncAutoCompleteProps<T>
 
 export function AsyncAutoComplete<T>({
   service,
-  execution,
   onMapToOptions,
   onLoading,
   onSuccess,
@@ -29,7 +28,6 @@ export function AsyncAutoComplete<T>({
   ...rest
 }: AsyncAutoCompleteProps<T>) {
   const { connectivityState, options, execute } = useService(service, {
-    execution,
     mappers: {
       onMapToOptions,
     },

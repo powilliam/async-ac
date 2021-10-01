@@ -3,8 +3,6 @@ import { useState, useEffect, useCallback } from "react";
 import { Option } from "../@types/option";
 import { ConnectivityState } from "../@types/connectivity";
 
-export type ExecutionMode = "ON_MOUNT" | "WHEN_CALLED";
-
 export interface ServiceMappers<T> {
   onMapToOptions(value: T): Option<any>[];
 }
@@ -16,7 +14,6 @@ export interface ServiceLifecycle<T> {
 }
 
 export interface UseServiceConfig<T> {
-  execution?: ExecutionMode;
   mappers: ServiceMappers<T>;
   lifecycle: ServiceLifecycle<T>;
 }
@@ -30,7 +27,6 @@ export interface UseService<T> {
 export function useService<T>(
   executor: () => Promise<T>,
   {
-    execution = "ON_MOUNT",
     mappers: { onMapToOptions },
     lifecycle: { onLoading, onSuccess, onFailure },
   }: UseServiceConfig<T>
@@ -55,7 +51,7 @@ export function useService<T>(
   }, [executor, onMapToOptions, onLoading, onSuccess, onFailure]);
 
   useEffect(() => {
-    execution === "ON_MOUNT" && execute();
+    execute();
   }, []);
 
   return {
