@@ -5,8 +5,11 @@ import {
   UseServiceConfig,
 } from "../hooks/use-service";
 
+import { useKonamiCode } from "../hooks/use-konami-code";
+
 import { ConnectivityStatus } from "./connectivity-status";
 import { AutoComplete, AutoCompleteProps } from "./auto-complete";
+import { KONAMI_SEQUENCE } from "../constants/keys";
 export interface AsyncAutoCompleteProps<T>
   extends Omit<AutoCompleteProps, "options">,
     Omit<UseServiceConfig<T>, "lifecycle" | "mappers">,
@@ -24,7 +27,7 @@ export function AsyncAutoComplete<T>({
   onFailure,
   ...rest
 }: AsyncAutoCompleteProps<T>) {
-  const { connectivityState, options } = useService(service, {
+  const { connectivityState, options, execute } = useService(service, {
     execution,
     mappers: {
       onMapToOptions,
@@ -35,6 +38,8 @@ export function AsyncAutoComplete<T>({
       onFailure,
     },
   });
+
+  useKonamiCode(execute, { sequence: KONAMI_SEQUENCE });
 
   return (
     <AutoComplete
