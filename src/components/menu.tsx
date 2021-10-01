@@ -5,8 +5,8 @@ import { Option } from "../@types/option";
 
 export interface MenuProps extends BoxProps {
   isOpen?: boolean;
-  options?: Option<number, string>[];
-  onSelectOption?(option: Option<number, string>): void;
+  options?: Option<any>[];
+  onSelectOption?(option: Option<any>): void;
 }
 
 function MenuComponent(
