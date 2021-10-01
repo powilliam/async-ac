@@ -1,4 +1,10 @@
-import { useRef, RefObject, forwardRef, ForwardedRef } from "react";
+import {
+  useRef,
+  RefObject,
+  forwardRef,
+  ForwardedRef,
+  FunctionComponent,
+} from "react";
 import {
   Box,
   InputGroup,
@@ -6,54 +12,51 @@ import {
   InputLeftElement,
   InputRightElement,
   BoxProps,
-  CircularProgress,
 } from "@chakra-ui/react";
-import { ChevronDownIcon, CloseIcon, WarningIcon } from "@chakra-ui/icons";
+import { ChevronDownIcon, CloseIcon } from "@chakra-ui/icons";
 
 import { useAutoCompleteState } from "../hooks/use-autocomplete-state";
 
 import { Option } from "../@types/option";
 
-import { DEFAULT_ICON_SIZE, SMALL_ICON_SIZE } from "../constants/icon";
+import { SMALL_ICON_SIZE } from "../constants/icon";
 
 import { Menu } from "./menu";
-import { ConnectivityState } from "../@types/connectivity";
+
+export interface RightComponentProps {
+  value: string;
+}
 
 export interface AutoCompleteProps extends BoxProps {
-  connectivityState?: ConnectivityState;
   options: Option<any>[];
+  LeftComponent?: FunctionComponent;
+  RightComponent?: FunctionComponent<RightComponentProps>;
 }
 
 function AutoCompleteComponent(
-  { connectivityState = "IDLE", options, ...rest }: AutoCompleteProps,
-  ref: ForwardedRef<HTMLInputElement>
+  { LeftComponent, RightComponent, options, ...rest }: AutoCompleteProps,
+  inputRef: ForwardedRef<HTMLInputElement>
 ) {
   const menuRef = useRef() as RefObject<HTMLDivElement>;
 
   const { value, isMenuOpen, reset, onChange, onSelectOption } =
-    useAutoCompleteState({ ref: menuRef });
+    useAutoCompleteState({
+      ref: menuRef,
+    });
 
   return (
     <Box position="relative" {...rest}>
       <InputGroup>
-        {["LOADING", "FAILURE"].includes(connectivityState) && (
+        {LeftComponent && (
           <InputLeftElement>
-            {connectivityState === "LOADING" && (
-              <CircularProgress
-                isIndeterminate
-                size={DEFAULT_ICON_SIZE.w}
-                trackColor="transparent"
-                color="blue.300"
-              />
-            )}
-            {connectivityState === "FAILURE" && (
-              <WarningIcon {...DEFAULT_ICON_SIZE} color="red.300" />
-            )}
+            <LeftComponent />
           </InputLeftElement>
         )}
-        <Input ref={ref} value={value} onChange={onChange} />
+        <Input ref={inputRef} value={value} onChange={onChange} />
         <InputRightElement>
-          {!value ? (
+          {RightComponent ? (
+            <RightComponent value={value} />
+          ) : !value ? (
             <ChevronDownIcon {...SMALL_ICON_SIZE} />
           ) : (
             <CloseIcon {...SMALL_ICON_SIZE} cursor="pointer" onClick={reset} />

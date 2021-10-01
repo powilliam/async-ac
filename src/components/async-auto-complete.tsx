@@ -5,8 +5,8 @@ import {
   UseServiceConfig,
 } from "../hooks/use-service";
 
+import { ConnectivityStatus } from "./connectivity-status";
 import { AutoComplete, AutoCompleteProps } from "./auto-complete";
-
 export interface AsyncAutoCompleteProps<T>
   extends Omit<AutoCompleteProps, "options">,
     Omit<UseServiceConfig<T>, "lifecycle" | "mappers">,
@@ -38,7 +38,9 @@ export function AsyncAutoComplete<T>({
 
   return (
     <AutoComplete
-      connectivityState={connectivityState}
+      LeftComponent={() => (
+        <ConnectivityStatus connectivityState={connectivityState} />
+      )}
       options={options}
       {...rest}
     />
