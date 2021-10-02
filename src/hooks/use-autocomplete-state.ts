@@ -9,12 +9,6 @@ import { useOutsideClick } from "@chakra-ui/react";
 
 import { Option } from "../@types/option";
 
-export type OnChangeValueCallback<T = any> = (
-  value: T extends ChangeEvent<HTMLInputElement>
-    ? ChangeEvent<HTMLInputElement>
-    : string
-) => void;
-
 export interface UseAutoCompleteStateConfig<T extends RefObject<HTMLElement>>
   extends Partial<Omit<AutoCompleteState, "onResetState">> {
   ref: T;
@@ -25,7 +19,7 @@ export interface AutoCompleteState {
   isMenuOpen: boolean;
   selected?: Option<any>;
   onInputFocus: FocusEventHandler<HTMLInputElement>;
-  onChangeValue: OnChangeValueCallback;
+  onChangeValue: (value: string) => void;
   onSelectOption(option: Option<any>): void;
   onResetState(): void;
 }
@@ -39,13 +33,9 @@ export function useAutoCompleteState<T extends RefObject<HTMLElement>>({
   onChangeValue: propsOnChange,
   onSelectOption: propsOnSelectOption,
 }: UseAutoCompleteStateConfig<T>): AutoCompleteState {
-  const [value, valueSet] = useState<string>(propsValue ?? "");
-  const [selected, selectedSet] = useState<Option<any> | undefined>(
-    propsSelected
-  );
-  const [isMenuOpen, isMenuOpenSet] = useState<boolean>(
-    propsIsMenuOpen ?? false
-  );
+  const [value, valueSet] = useState<string>("");
+  const [selected, selectedSet] = useState<Option<any> | undefined>();
+  const [isMenuOpen, isMenuOpenSet] = useState<boolean>(false);
 
   const onInputFocus = useCallback<FocusEventHandler<HTMLInputElement>>(
     (e) => {
@@ -55,10 +45,9 @@ export function useAutoCompleteState<T extends RefObject<HTMLElement>>({
     [isMenuOpen, propsOnFocus]
   );
 
-  const onChangeValue = useCallback<OnChangeValueCallback>(
-    (e) => {
-      const newValue = typeof e === "string" ? e : e.target.value;
-      !!propsOnChange ? propsOnChange(newValue) : valueSet(newValue);
+  const onChangeValue = useCallback(
+    (value) => {
+      !!propsOnChange ? propsOnChange(value) : valueSet(value);
       !isMenuOpen && isMenuOpenSet(true);
     },
     [isMenuOpen, propsOnChange]
@@ -86,9 +75,9 @@ export function useAutoCompleteState<T extends RefObject<HTMLElement>>({
   });
 
   return {
-    value,
-    isMenuOpen,
-    selected,
+    value: propsValue ?? value,
+    isMenuOpen: propsIsMenuOpen ?? isMenuOpen,
+    selected: propsSelected ?? selected,
     onInputFocus,
     onChangeValue,
     onSelectOption,
