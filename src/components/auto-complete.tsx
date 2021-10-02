@@ -72,8 +72,8 @@ function AutoCompleteComponent(
         <Input
           ref={inputRef}
           value={state.value}
+          onChange={(e) => state.onChangeValue(e.target.value)}
           onFocus={state.onInputFocus}
-          onChange={state.onChangeValue}
         />
         <InputRightElement>
           {RightComponent ? (
