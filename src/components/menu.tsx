@@ -6,6 +6,9 @@ import { SMALL_ICON_SIZE } from "../constants/icon";
 
 import { Option } from "../@types/option";
 
+const DEFAULT_BUTTON_SIZE = 40;
+const MAX_NUMBER_OF_BUTTONS = 4;
+
 export interface MenuProps extends BoxProps {
   isOpen?: boolean;
   selected?: Option<any>;
@@ -23,6 +26,16 @@ function MenuComponent(
   }: MenuProps,
   ref: ForwardedRef<HTMLDivElement>
 ) {
+  const height = useMemo(
+    () => ({
+      maxHeight:
+        options.length >= MAX_NUMBER_OF_BUTTONS
+          ? `${MAX_NUMBER_OF_BUTTONS * DEFAULT_BUTTON_SIZE}px`
+          : undefined,
+    }),
+    [options]
+  );
+
   const shouldAppear = useMemo(
     () => isOpen && options.length > 0,
     [isOpen, options]
@@ -44,7 +57,9 @@ function MenuComponent(
           as="ul"
           listStyleType="none"
           zIndex="3"
-          overflow="auto"
+          overflow="scroll"
+          onSeeked={() => console.log("seekd")}
+          {...height}
           {...rest}
         >
           {options.map((it) => (
