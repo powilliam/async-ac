@@ -1,33 +1,42 @@
 import {
+  ServiceBehaviors,
   ServiceLifecycle,
   ServiceMappers,
   useService,
   UseServiceConfig,
 } from "../hooks/use-service";
-
 import { useKonamiCode } from "../hooks/use-konami-code";
+import { usePagingSource } from "../hooks/use-paging-source";
+import { useOnScroll } from "../hooks/use-on-scroll";
+
+import { KONAMI_SEQUENCE } from "../constants/keys";
+
+import { PagingSourceService } from "../@types/paging-source";
 
 import { ConnectivityStatus } from "./connectivity-status";
 import { AutoComplete, AutoCompleteProps } from "./auto-complete";
-import { KONAMI_SEQUENCE } from "../constants/keys";
 
-export interface AsyncAutoCompleteProps<T>
+export interface AsyncAutoCompleteProps<T, K>
   extends Omit<AutoCompleteProps, "options">,
-    Omit<UseServiceConfig<T>, "lifecycle" | "mappers">,
+    Omit<UseServiceConfig<T>, "lifecycle" | "mappers" | "behaviors">,
     ServiceMappers<T>,
-    ServiceLifecycle<T> {
-  service: () => Promise<T>;
+    ServiceLifecycle<T>,
+    ServiceBehaviors {
+  service: PagingSourceService<K, T>;
 }
 
-export function AsyncAutoComplete<T>({
-  service,
+export function AsyncAutoComplete<T, K>({
+  service: propsService,
+  paginated: propsPaginated = true,
   onMapToOptions,
   onLoading,
   onSuccess,
   onFailure,
   ...rest
-}: AsyncAutoCompleteProps<T>) {
-  const { connectivityState, options, execute } = useService(service, {
+}: AsyncAutoCompleteProps<T, K>) {
+  const { service, paginate } = usePagingSource(propsService);
+
+  const { connectivityState, options } = useService(service, {
     mappers: {
       onMapToOptions,
     },
@@ -36,9 +45,14 @@ export function AsyncAutoComplete<T>({
       onSuccess,
       onFailure,
     },
+    behaviors: {
+      paginated: propsPaginated,
+    },
   });
 
-  useKonamiCode(execute, { sequence: KONAMI_SEQUENCE });
+  const onScroll = useOnScroll(paginate);
+
+  useKonamiCode(paginate, { sequence: KONAMI_SEQUENCE });
 
   return (
     <AutoComplete
@@ -46,6 +60,7 @@ export function AsyncAutoComplete<T>({
         <ConnectivityStatus connectivityState={connectivityState} />
       )}
       options={options}
+      onScroll={onScroll}
       {...rest}
     />
   );

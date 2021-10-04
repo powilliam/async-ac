@@ -13,9 +13,14 @@ export interface ServiceLifecycle<T> {
   onFailure?<T extends Error>(reason: T): void;
 }
 
+export interface ServiceBehaviors {
+  paginated?: boolean;
+}
+
 export interface UseServiceConfig<T> {
   mappers: ServiceMappers<T>;
   lifecycle: ServiceLifecycle<T>;
+  behaviors: ServiceBehaviors;
 }
 
 export interface UseService<T> {
@@ -29,6 +34,7 @@ export function useService<T>(
   {
     mappers: { onMapToOptions },
     lifecycle: { onLoading, onSuccess, onFailure },
+    behaviors: { paginated },
   }: UseServiceConfig<T>
 ): UseService<T> {
   const [connectivityState, connectivityStateSet] =
@@ -41,7 +47,7 @@ export function useService<T>(
     try {
       const response = await executor();
       const options = onMapToOptions(response);
-      optionsSet(options);
+      optionsSet((previous) => [...(paginated ? previous : []), ...options]);
       connectivityStateSet("SUCCESSFUL");
       onSuccess && onSuccess(response);
     } catch (error) {
