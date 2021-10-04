@@ -1,4 +1,4 @@
-import { PagingSourceResult, PagingSourceState } from "../@types/service";
+import { PagingSourceResult, PagingSourceState } from "../@types/paging-source";
 import { MEMBERS, PAGINATED_MEMBERS } from "../constants/balde";
 
 import { wait } from "../utils/promise";
@@ -11,9 +11,13 @@ export async function getPaginatedMembers(
   previousState: PagingSourceState<number>
 ): Promise<PagingSourceResult<number, string[]>> {
   const page = previousState.nextKey ?? 1;
-  const data = await wait(PAGINATED_MEMBERS[page], 2000);
+  const response = await wait(PAGINATED_MEMBERS[page], 2000);
   return {
-    data,
-    state: { nextKey: !!data ? page + 1 : undefined, previousKey: page },
+    data: response.members,
+    state: {
+      nextKey: response.pagination.nextPage,
+      previousKey: response.pagination.previousPage,
+      hasReachedTheEnd: !response.pagination.nextPage,
+    },
   };
 }

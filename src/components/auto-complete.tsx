@@ -47,6 +47,7 @@ function AutoCompleteComponent(
     onInputFocus,
     onChangeValue,
     onSelectOption,
+    onScroll,
     ...rest
   }: AutoCompleteProps,
   inputRef: ForwardedRef<HTMLInputElement>
@@ -95,6 +96,7 @@ function AutoCompleteComponent(
         options={options}
         isOpen={state.isMenuOpen}
         onSelectOption={state.onSelectOption}
+        onScroll={onScroll}
       />
     </Box>
   );

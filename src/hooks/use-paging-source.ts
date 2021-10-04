@@ -1,31 +1,39 @@
-import { useState, useCallback } from "react";
+import { useRef, useCallback } from "react";
 
 import {
-  PagingSourceConfig,
   PagingSourceService,
   PagingSourceState,
   ServicePagingSource,
-} from "../@types/service";
+} from "../@types/paging-source";
+
+const initialPagingSourceState = {
+  hasReachedTheEnd: false,
+};
 
 export function usePagingSource<T, K>(
-  pagingSourceService: PagingSourceService<T, K>,
-  config?: PagingSourceConfig<T>
-): Omit<ServicePagingSource<T, K>, "config"> {
-  const [pagingSourceState, pagingSourceStateSet] = useState<
-    PagingSourceState<T>
-  >({});
+  pagingSourceService: PagingSourceService<T, K>
+): ServicePagingSource<T, K> {
+  const pagingSourceState = useRef<PagingSourceState<T>>(
+    initialPagingSourceState
+  );
 
   const service = useCallback(async () => {
     const { state, data } = await pagingSourceService(
-      pagingSourceState,
-      config
+      pagingSourceState.current
     );
-    pagingSourceStateSet(state);
+    pagingSourceState.current = state;
     return data;
   }, [pagingSourceService, pagingSourceState]);
 
+  const paginate = useCallback(
+    async () =>
+      !pagingSourceState.current.hasReachedTheEnd ? await service() : ({} as K),
+    [pagingSourceState, service]
+  );
+
   return {
+    state: pagingSourceState.current,
     service,
-    state: pagingSourceState,
+    paginate,
   };
 }

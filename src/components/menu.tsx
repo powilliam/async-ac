@@ -58,7 +58,6 @@ function MenuComponent(
           listStyleType="none"
           zIndex="3"
           overflow="scroll"
-          onSeeked={() => console.log("seekd")}
           {...height}
           {...rest}
         >
