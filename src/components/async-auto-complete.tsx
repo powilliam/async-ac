@@ -1,3 +1,5 @@
+import { forwardRef, ForwardedRef } from "react";
+
 import { useAutoCompleteService } from "../hooks/use-auto-complete-service";
 import { useKonamiCode } from "../hooks/use-konami-code";
 import { usePagingSource } from "../hooks/use-paging-source";
@@ -25,15 +27,18 @@ export interface AsyncAutoCompleteProps<T, K>
   service: PagingSourceService<K, T>;
 }
 
-export function AsyncAutoComplete<T, K>({
-  service: propsService,
-  paginated: propsPaginated = true,
-  onMapToOptions,
-  onLoading,
-  onSuccess,
-  onFailure,
-  ...rest
-}: AsyncAutoCompleteProps<T, K>) {
+function AsyncAutoCompleteComponent<T, K>(
+  {
+    service: propsService,
+    paginated: propsPaginated = true,
+    onMapToOptions,
+    onLoading,
+    onSuccess,
+    onFailure,
+    ...rest
+  }: AsyncAutoCompleteProps<T, K>,
+  ref: ForwardedRef<HTMLInputElement>
+) {
   const { state, service } = usePagingSource(propsService);
 
   const { connectivityState, options, execute } = useAutoCompleteService(
@@ -63,6 +68,7 @@ export function AsyncAutoComplete<T, K>({
 
   return (
     <AutoComplete
+      ref={ref}
       LeftComponent={() => (
         <ConnectivityStatus connectivityState={connectivityState} />
       )}
@@ -72,3 +78,5 @@ export function AsyncAutoComplete<T, K>({
     />
   );
 }
+
+export const AsyncAutoComplete = forwardRef(AsyncAutoCompleteComponent);
