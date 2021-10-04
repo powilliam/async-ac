@@ -18,7 +18,7 @@ import { ChevronDownIcon, CloseIcon } from "@chakra-ui/icons";
 import {
   AutoCompleteState,
   useAutoCompleteState,
-} from "../hooks/use-autocomplete-state";
+} from "../hooks/use-auto-complete-state";
 
 import { Option } from "../@types/option";
 

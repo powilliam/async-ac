@@ -1,10 +1,4 @@
-import {
-  RefObject,
-  useState,
-  useCallback,
-  ChangeEvent,
-  FocusEventHandler,
-} from "react";
+import { RefObject, useState, useCallback, FocusEventHandler } from "react";
 import { useOutsideClick } from "@chakra-ui/react";
 
 import { Option } from "../@types/option";

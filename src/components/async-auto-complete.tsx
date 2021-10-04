@@ -1,10 +1,4 @@
-import {
-  ServiceBehaviors,
-  ServiceLifecycle,
-  ServiceMappers,
-  useService,
-  UseServiceConfig,
-} from "../hooks/use-service";
+import { useAutoCompleteService } from "../hooks/use-auto-complete-service";
 import { useKonamiCode } from "../hooks/use-konami-code";
 import { usePagingSource } from "../hooks/use-paging-source";
 import { useOnScroll } from "../hooks/use-on-scroll";
@@ -12,13 +6,19 @@ import { useOnScroll } from "../hooks/use-on-scroll";
 import { KONAMI_SEQUENCE } from "../constants/keys";
 
 import { PagingSourceService } from "../@types/paging-source";
+import {
+  ServiceBehaviors,
+  ServiceConfig,
+  ServiceLifecycle,
+  ServiceMappers,
+} from "../@types/auto-complete-service";
 
 import { ConnectivityStatus } from "./connectivity-status";
 import { AutoComplete, AutoCompleteProps } from "./auto-complete";
 
 export interface AsyncAutoCompleteProps<T, K>
   extends Omit<AutoCompleteProps, "options">,
-    Omit<UseServiceConfig<T>, "lifecycle" | "mappers" | "behaviors">,
+    Omit<ServiceConfig<T>, "lifecycle" | "mappers" | "behaviors">,
     ServiceMappers<T>,
     ServiceLifecycle<T>,
     ServiceBehaviors {
@@ -36,19 +36,22 @@ export function AsyncAutoComplete<T, K>({
 }: AsyncAutoCompleteProps<T, K>) {
   const { state, service } = usePagingSource(propsService);
 
-  const { connectivityState, options, execute } = useService(service, {
-    mappers: {
-      onMapToOptions,
-    },
-    lifecycle: {
-      onLoading,
-      onSuccess,
-      onFailure,
-    },
-    behaviors: {
-      paginated: propsPaginated,
-    },
-  });
+  const { connectivityState, options, execute } = useAutoCompleteService(
+    service,
+    {
+      mappers: {
+        onMapToOptions,
+      },
+      lifecycle: {
+        onLoading,
+        onSuccess,
+        onFailure,
+      },
+      behaviors: {
+        paginated: propsPaginated,
+      },
+    }
+  );
 
   const onScroll = useOnScroll(
     async () => !state.hasReachedTheEnd && (await execute())
