@@ -34,9 +34,9 @@ export function AsyncAutoComplete<T, K>({
   onFailure,
   ...rest
 }: AsyncAutoCompleteProps<T, K>) {
-  const { service, paginate } = usePagingSource(propsService);
+  const { state, service } = usePagingSource(propsService);
 
-  const { connectivityState, options } = useService(service, {
+  const { connectivityState, options, execute } = useService(service, {
     mappers: {
       onMapToOptions,
     },
@@ -50,9 +50,13 @@ export function AsyncAutoComplete<T, K>({
     },
   });
 
-  const onScroll = useOnScroll(paginate);
+  const onScroll = useOnScroll(
+    async () => !state.hasReachedTheEnd && (await execute())
+  );
 
-  useKonamiCode(paginate, { sequence: KONAMI_SEQUENCE });
+  useKonamiCode(async () => !state.hasReachedTheEnd && (await execute()), {
+    sequence: KONAMI_SEQUENCE,
+  });
 
   return (
     <AutoComplete

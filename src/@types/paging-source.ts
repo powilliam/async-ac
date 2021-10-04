@@ -16,5 +16,4 @@ export type PagingSourceService<T, K> = (
 export interface ServicePagingSource<T, K> {
   state: PagingSourceState<T>;
   service: () => Promise<K>;
-  paginate: () => Promise<K>;
 }

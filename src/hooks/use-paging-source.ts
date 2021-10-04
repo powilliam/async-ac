@@ -25,15 +25,8 @@ export function usePagingSource<T, K>(
     return data;
   }, [pagingSourceService, pagingSourceState]);
 
-  const paginate = useCallback(
-    async () =>
-      !pagingSourceState.current.hasReachedTheEnd ? await service() : ({} as K),
-    [pagingSourceState, service]
-  );
-
   return {
     state: pagingSourceState.current,
     service,
-    paginate,
   };
 }
